@@ -28,6 +28,10 @@
     "lint:api": "nx lint api",
     "format": "prettier --write \"**/*.{ts,tsx,html,css,scss,json,md}\"",
     "format:check": "prettier --check \"**/*.{ts,tsx,html,css,scss,json,md}\"",
+    "deploy": "./scripts/deploy.sh all",
+    "deploy:web": "./scripts/deploy.sh web",
+    "deploy:admin": "./scripts/deploy.sh admin",
+    "deploy:api": "./scripts/deploy.sh api",
     "prepare": "husky install"
   },
   "dependencies": {

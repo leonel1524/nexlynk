@@ -19,7 +19,7 @@
 -- ============================================
 DO $$
 DECLARE
-  test_user_id UUID := 'YOUR_USER_ID_HERE';  -- <-- CHANGE THIS!
+  test_user_id UUID := 'e0954c43-2188-4bf6-b9b7-11176e41f6ea';  -- <-- CHANGE THIS!
   business_id UUID;
   menu_id UUID;
   entrada_cat_id UUID;
