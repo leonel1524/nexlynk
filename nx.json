@@ -1,0 +1,44 @@
+{
+  "$schema": "./node_modules/nx/schemas/nx-schema.json",
+  "namedInputs": {
+    "default": ["{projectRoot}/**/*", "sharedGlobals"],
+    "sharedGlobals": [],
+    "production": [
+      "default",
+      "!{projectRoot}/**/*.spec.ts",
+      "!{projectRoot}/**/*.test.ts",
+      "!{projectRoot}/**/*.stories.ts",
+      "!{projectRoot}/**/*.stories.mdx",
+      "!{projectRoot}/**/README.md"
+    ]
+  },
+  "targetDefaults": {
+    "build": {
+      "dependsOn": ["^build"],
+      "inputs": ["production", "^production"]
+    },
+    "test": {
+      "inputs": ["default", "{workspaceRoot}/jest.preset.js"]
+    },
+    "lint": {
+      "inputs": [
+        "default",
+        "{workspaceRoot}/.eslintrc.json",
+        "{workspaceRoot}/.eslintrc.js"
+      ]
+    }
+  },
+  "defaultProject": "web",
+  "generators": {
+    "@nx/js": {
+      "application": {
+        "style": "none",
+        "linter": "eslint"
+      },
+      "library": {
+        "style": "none",
+        "linter": "eslint"
+      }
+    }
+  }
+}

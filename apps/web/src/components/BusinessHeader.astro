@@ -1,0 +1,52 @@
+---
+export interface Props {
+  name: string;
+  logo?: string;
+  cover?: string;
+  description?: string;
+}
+
+const { name, logo, cover, description } = Astro.props;
+---
+
+<header class="relative">
+  <!-- Cover Image -->
+  {cover && (
+    <div class="relative h-48 md:h-64 overflow-hidden">
+      <img 
+        src={cover} 
+        alt={`${name} cover`}
+        class="w-full h-full object-cover"
+      />
+      <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
+    </div>
+  )}
+
+  <!-- Business Info -->
+  <div class={`relative ${cover ? '-mt-20' : 'pt-8'} px-4`}>
+    <div class="max-w-lg mx-auto text-center">
+      <!-- Logo -->
+      {logo && (
+        <div class="mb-4">
+          <img 
+            src={logo} 
+            alt={`${name} logo`}
+            class="w-24 h-24 rounded-full border-4 border-white shadow-lg mx-auto object-cover"
+          />
+        </div>
+      )}
+
+      <!-- Name -->
+      <h1 class="text-3xl font-bold text-gray-900 mb-2">
+        {name}
+      </h1>
+
+      <!-- Description -->
+      {description && (
+        <p class="text-gray-600 text-lg">
+          {description}
+        </p>
+      )}
+    </div>
+  </div>
+</header>

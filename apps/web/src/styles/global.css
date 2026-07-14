@@ -1,0 +1,57 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+@layer base {
+  html {
+    font-family: 'Inter', system-ui, sans-serif;
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-gray-50 text-gray-900 antialiased;
+  }
+}
+
+@layer components {
+  .btn-primary {
+    @apply bg-brand text-white px-6 py-3 rounded-full font-medium 
+           hover:bg-brand-dark transition-all duration-200 
+           shadow-lg hover:shadow-xl hover:-translate-y-0.5;
+  }
+
+  .btn-secondary {
+    @apply bg-white text-brand border-2 border-brand px-6 py-3 rounded-full font-medium 
+           hover:bg-brand hover:text-white transition-all duration-200;
+  }
+
+  .card {
+    @apply bg-white rounded-2xl shadow-lg p-6 transition-all duration-200;
+  }
+
+  .card-hover {
+    @apply hover:shadow-xl hover:-translate-y-1;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-gray-900 mb-4;
+  }
+
+  .section-subtitle {
+    @apply text-gray-600 mb-6;
+  }
+
+  .whatsapp-btn {
+    @apply bg-green-500 text-white px-6 py-3 rounded-full font-medium 
+           hover:bg-green-600 transition-all duration-200 
+           flex items-center justify-center gap-2;
+  }
+
+  .maps-btn {
+    @apply bg-blue-500 text-white px-6 py-3 rounded-full font-medium 
+           hover:bg-blue-600 transition-all duration-200 
+           flex items-center justify-center gap-2;
+  }
+}

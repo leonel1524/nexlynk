@@ -1,0 +1,50 @@
+{
+  "name": "nexlynk",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Nexlynk - El enlace entre tu negocio y el mundo",
+  "author": "Nexlynk",
+  "license": "MIT",
+  "workspaces": [
+    "apps/*",
+    "libs/*"
+  ],
+  "scripts": {
+    "dev": "nx run-many --target=serve --all",
+    "dev:web": "nx serve web",
+    "dev:admin": "nx serve admin",
+    "dev:api": "nx serve api",
+    "build": "nx run-many --target=build --all",
+    "build:web": "nx build web",
+    "build:admin": "nx build admin",
+    "build:api": "nx build api",
+    "test": "nx run-many --target=test --all",
+    "test:web": "nx test web",
+    "test:admin": "nx test admin",
+    "test:api": "nx test api",
+    "lint": "nx run-many --target=lint --all",
+    "lint:web": "nx lint web",
+    "lint:admin": "nx lint admin",
+    "lint:api": "nx lint api",
+    "format": "prettier --write \"**/*.{ts,tsx,html,css,scss,json,md}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,html,css,scss,json,md}\"",
+    "prepare": "husky install"
+  },
+  "dependencies": {
+    "tslib": "^2.6.0"
+  },
+  "devDependencies": {
+    "@nx/js": "23.1.0",
+    "@nx/workspace": "23.1.0",
+    "nx": "23.1.0",
+    "typescript": "~5.5.0",
+    "prettier": "^3.2.0",
+    "husky": "^9.0.0",
+    "lint-staged": "^15.2.0"
+  },
+  "lint-staged": {
+    "*.{ts,tsx,html,css,scss,json,md}": [
+      "prettier --write"
+    ]
+  }
+}

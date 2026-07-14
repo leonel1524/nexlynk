@@ -1,0 +1,20 @@
+{
+  "compileOnSave": false,
+  "compilerOptions": {
+    "rootDir": ".",
+    "sourceMap": true,
+    "declaration": false,
+    "moduleResolution": "bundler",
+    "target": "ES2022",
+    "module": "ES2022",
+    "lib": ["ES2022", "dom"],
+    "skipLibCheck": true,
+    "skipDefaultLibCheck": true,
+    "baseUrl": ".",
+    "paths": {
+      "@nexlynk/shared": ["libs/shared/src/index.ts"],
+      "@nexlynk/shared/*": ["libs/shared/src/*"]
+    }
+  },
+  "exclude": ["node_modules", "tmp"]
+}
