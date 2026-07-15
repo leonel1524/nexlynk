@@ -79,7 +79,7 @@ Tu admin estará en: `https://tu-admin.vercel.app`
 ### Variables de Entorno:
 ```
 API_URL=https://nexlynk-api.onrender.com/api
-NODE_VERSION=18
+NODE_VERSION=22
 ```
 
 ### Resultado:
