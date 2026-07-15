@@ -2,12 +2,13 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { Business, Menu, Location, ApiResponse, PaginatedResponse } from '@nexlynk/shared';
+import { environment } from '../../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BusinessService {
-  private readonly API_URL = '/api/businesses';
+  private readonly API_URL = `${environment.apiUrl}/businesses`;
 
   constructor(private http: HttpClient) {}
 
