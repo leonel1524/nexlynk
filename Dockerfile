@@ -13,9 +13,6 @@ RUN npm ci
 # Copy source code
 COPY . .
 
-# Build shared library
-RUN npm run build --workspace=libs/shared
-
 # Build API
 RUN npm run build --workspace=apps/api
 
