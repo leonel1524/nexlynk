@@ -64,7 +64,7 @@ Tu admin estará en: `https://tu-admin.vercel.app`
 
 ---
 
-## 3. Deploy Web (Cloudflare Pages)
+## 3. Deploy Web (Cloudflare Pages - SSR)
 
 ### Pasos:
 1. Ve a [dash.cloudflare.com](https://dash.cloudflare.com)
@@ -72,9 +72,9 @@ Tu admin estará en: `https://tu-admin.vercel.app`
 3. Selecciona tu repositorio `nexlynk`
 4. Configura:
    - **Production branch**: `main`
-   - **Build command**: `npm ci && npm run build --workspace=apps/web`
+   - **Build command**: `npm ci && npm run build:web`
    - **Build output directory**: `apps/web/dist`
-   - **Root directory**: `/` (dejar vacío o seleccionar la raíz)
+   - **Root directory**: `/` (dejar vacío)
 
 ### Variables de Entorno:
 ```
@@ -84,6 +84,8 @@ NODE_VERSION=18
 
 ### Resultado:
 Tu página pública estará en: `https://tu-pagina.pages.dev`
+
+> **Nota**: El web usa SSR (server-side rendering) para páginas dinámicas como `/el-sabor`. Cada request al API se ejecuta en Cloudflare Workers.
 
 ---
 

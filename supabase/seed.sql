@@ -52,7 +52,7 @@ BEGIN
     plan
   ) VALUES (
     uuid_generate_v4(),
-    test_user_id,
+    'e0954c43-2188-4bf6-b9b7-11176e41f6ea',
     'restaurante-el-sabor',
     'Restaurante El Sabor',
     'La mejor comida tradicional venezolana de la ciudad. Más de 20 años de experiencia.',

@@ -35,16 +35,17 @@
     "prepare": "husky install"
   },
   "dependencies": {
+    "@astrojs/cloudflare": "^9.2.1",
     "tslib": "^2.6.0"
   },
   "devDependencies": {
     "@nx/js": "23.1.0",
     "@nx/workspace": "23.1.0",
-    "nx": "23.1.0",
-    "typescript": "~5.5.0",
-    "prettier": "^3.2.0",
     "husky": "^9.0.0",
-    "lint-staged": "^15.2.0"
+    "lint-staged": "^15.2.0",
+    "nx": "23.1.0",
+    "prettier": "^3.2.0",
+    "typescript": "~5.5.0"
   },
   "lint-staged": {
     "*.{ts,tsx,html,css,scss,json,md}": [
