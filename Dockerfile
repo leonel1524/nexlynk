@@ -3,9 +3,9 @@ FROM node:22-alpine AS build
 WORKDIR /app
 
 # Copy package files
-COPY ../../package.json package-lock.json ./
-COPY package.json ./apps/api/
-COPY ../../libs/shared/package.json ./libs/shared/
+COPY package.json package-lock.json ./
+COPY apps/api/package.json ./apps/api/
+COPY libs/shared/package.json ./libs/shared/
 
 # Install dependencies
 RUN npm ci
