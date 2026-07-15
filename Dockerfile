@@ -8,7 +8,7 @@ COPY apps/api/package.json ./apps/api/
 COPY libs/shared/package.json ./libs/shared/
 
 # Install dependencies
-RUN npm ci
+RUN npm ci --legacy-peer-deps
 
 # Copy source code
 COPY . .
