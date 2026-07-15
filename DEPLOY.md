@@ -21,10 +21,8 @@
    - **Name**: `nexlynk-api`
    - **Region**: Oregon (US West)
    - **Branch**: `main`
-   - **Root Directory**: `apps/api`
    - **Runtime**: Docker
-   - **Dockerfile Path**: `apps/api/Dockerfile`
-   - **Port**: `10000`
+   - **Dockerfile Path**: `Dockerfile`
 
 ### Variables de Entorno:
 ```
@@ -48,11 +46,11 @@ Tu API estará en: `https://nexlynk-api.onrender.com`
 2. Inicia sesión con GitHub
 3. Haz click en "New Project"
 4. Selecciona el repositorio `nexlynk`
-5. Configura:
+5. En "Configure Project":
    - **Framework Preset**: Angular
-   - **Root Directory**: `apps/admin`
-   - **Build Command**: `npm install && npm run build`
-   - **Output Directory**: `dist/browser`
+   - **Root Directory**: `/` (dejar vacío, no `apps/admin`)
+   - **Build Command**: usar el default (`npm install && npm run build:admin`)
+   - **Output Directory**: usar el default (`dist/browser`)
 
 ### Variables de Entorno:
 ```
@@ -62,23 +60,26 @@ API_URL=https://nexlynk-api.onrender.com/api
 ### Resultado:
 Tu admin estará en: `https://tu-admin.vercel.app`
 
+> **Nota importante**: El `vercel.json` está en la raíz del repo. NO pongas `apps/admin` como Root Directory — el build genera `dist/browser` en la raíz.
+
 ---
 
 ## 3. Deploy Web (Cloudflare Pages)
 
 ### Pasos:
 1. Ve a [dash.cloudflare.com](https://dash.cloudflare.com)
-2. Ve a "Workers & Pages" → "Create Application"
-3. Conecta tu repositorio de GitHub
+2. Ve a "Workers & Pages" → "Create Application" → "Connect to Git"
+3. Selecciona tu repositorio `nexlynk`
 4. Configura:
    - **Production branch**: `main`
-   - **Build command**: `cd apps/web && npm install && npm run build`
+   - **Build command**: `npm ci && npm run build --workspace=apps/web`
    - **Build output directory**: `apps/web/dist`
-   - **Node.js version**: 18
+   - **Root directory**: `/` (dejar vacío o seleccionar la raíz)
 
 ### Variables de Entorno:
 ```
 API_URL=https://nexlynk-api.onrender.com/api
+NODE_VERSION=18
 ```
 
 ### Resultado:

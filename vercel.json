@@ -1,0 +1,11 @@
+{
+  "buildCommand": "npm install && npm run build:admin",
+  "outputDirectory": "dist/browser",
+  "framework": "angular",
+  "rewrites": [
+    {
+      "source": "/((?!assets/).*)",
+      "destination": "/index.html"
+    }
+  ]
+}
