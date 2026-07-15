@@ -72,7 +72,7 @@ Tu admin estará en: `https://tu-admin.vercel.app`
 3. Selecciona tu repositorio `nexlynk`
 4. Configura:
    - **Production branch**: `main`
-   - **Build command**: `npm ci && npm run build:web`
+   - **Build command**: `npm ci --ignore-scripts && npm run build:web`
    - **Build output directory**: `apps/web/dist`
    - **Root directory**: `/` (dejar vacío)
 
