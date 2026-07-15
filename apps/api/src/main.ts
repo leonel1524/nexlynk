@@ -15,6 +15,8 @@ async function bootstrap() {
       'http://localhost:4200',
       'http://localhost:4300',
       'https://nexlynk.app',
+      'https://*.vercel.app',
+      'https://*.pages.dev',
     ],
     credentials: true,
   });
@@ -40,7 +42,7 @@ async function bootstrap() {
   SwaggerModule.setup('docs', app, document);
 
   const port = process.env.PORT || 3000;
-  await app.listen(port);
+  await app.listen(port, '0.0.0.0');
   
   console.log(`🚀 Nexlynk API running on: http://localhost:${port}`);
   console.log(`📚 Swagger docs: http://localhost:${port}/docs`);

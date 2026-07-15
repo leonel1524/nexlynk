@@ -4,36 +4,40 @@
 
 1. Cuenta en [Cloudflare](https://cloudflare.com) (gratis)
 2. Cuenta en [Vercel](https://vercel.com) (gratis)
-3. Cuenta en [Railway](https://railway.app) (gratis tier)
+3. Cuenta en [Render](https://render.com) (gratis)
 4. Cuenta en [Supabase](https://supabase.com) (ya configurada)
 5. Dominio registrado (opcional pero recomendado)
 
 ---
 
-## 1. Deploy API (Railway)
+## 1. Deploy API (Render)
 
 ### Pasos:
-1. Ve a [railway.app](https://railway.app)
+1. Ve a [render.com](https://render.com)
 2. Inicia sesión con GitHub
-3. Haz click en "New Project" → "Deploy from GitHub repo"
-4. Selecciona el repositorio `nexlynk`
+3. Haz click en "New" → "Web Service"
+4. Conecta tu repositorio `nexlynk`
 5. Configura:
+   - **Name**: `nexlynk-api`
+   - **Region**: Oregon (US West)
+   - **Branch**: `main`
    - **Root Directory**: `apps/api`
-   - **Build Command**: `npm install && npm run build`
-   - **Start Command**: `node dist/main`
+   - **Runtime**: Docker
+   - **Dockerfile Path**: `apps/api/Dockerfile`
+   - **Port**: `10000`
 
 ### Variables de Entorno:
 ```
+NODE_ENV=production
+PORT=10000
 SUPABASE_URL=tu-url-de-supabase
 SUPABASE_ANON_KEY=tu-anon-key
 SUPABASE_SERVICE_ROLE_KEY=tu-service-role-key
 JWT_SECRET=tu-secreto-jwt-seguro
-NODE_ENV=production
-PORT=3000
 ```
 
 ### Resultado:
-Tu API estará en: `https://tu-proyecto.up.railway.app`
+Tu API estará en: `https://nexlynk-api.onrender.com`
 
 ---
 
@@ -52,7 +56,7 @@ Tu API estará en: `https://tu-proyecto.up.railway.app`
 
 ### Variables de Entorno:
 ```
-API_URL=https://tu-api.up.railway.app/api
+API_URL=https://nexlynk-api.onrender.com/api
 ```
 
 ### Resultado:
@@ -74,7 +78,7 @@ Tu admin estará en: `https://tu-admin.vercel.app`
 
 ### Variables de Entorno:
 ```
-API_URL=https://tu-api.up.railway.app/api
+API_URL=https://nexlynk-api.onrender.com/api
 ```
 
 ### Resultado:
@@ -135,7 +139,7 @@ cd apps/api && npm run build
 
 ## Variables de Entorno Resumen
 
-### API (Railway)
+### API (Render)
 | Variable | Descripción |
 |----------|-------------|
 | `SUPABASE_URL` | URL de tu proyecto Supabase |
@@ -143,7 +147,7 @@ cd apps/api && npm run build
 | `SUPABASE_SERVICE_ROLE_KEY` | Key privada de Supabase |
 | `JWT_SECRET` | Secreto para JWT (genera uno seguro) |
 | `NODE_ENV` | `production` |
-| `PORT` | `3000` |
+| `PORT` | `10000` |
 
 ### Admin (Vercel)
 | Variable | Descripción |
@@ -162,7 +166,21 @@ cd apps/api && npm run build
 | Servicio | Plan | Costo |
 |----------|------|-------|
 | Supabase | Free | $0 |
-| Railway | Hobby | $5/mes (o free con limitaciones) |
+| Render | Free | $0 (con limitaciones) |
 | Vercel | Free | $0 |
 | Cloudflare Pages | Free | $0 |
-| **Total** | | **$0 - $5/mes** |
+| **Total** | | **$0/mes** |
+
+---
+
+## Notas Importantes
+
+### Render Free Tier:
+- Se duerme después de 15 minutos de inactividad
+- Tarda ~30-50 segundos en despertar
+- 750 horas/mes gratis
+- Perfecto para desarrollo y producción inicial
+
+### Para producción con tráfico:
+- Considera el plan Starter de Render ($7/mo)
+- O upgrade a Vercel Pro ($20/mo) para el admin

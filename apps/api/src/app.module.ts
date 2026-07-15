@@ -1,5 +1,6 @@
 import { Module } from '@nestjs/common';
 import { ConfigModule } from '@nestjs/config';
+import { HealthController } from './health.controller';
 import { AuthModule } from './auth/auth.module';
 import { BusinessesModule } from './businesses/businesses.module';
 import { MenusModule } from './menus/menus.module';
@@ -19,5 +20,6 @@ import { SupabaseModule } from './common/supabase/supabase.module';
     LocationsModule,
     AnalyticsModule,
   ],
+  controllers: [HealthController],
 })
 export class AppModule {}
