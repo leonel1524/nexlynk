@@ -1,7 +1,10 @@
 {
   "build": {
     "builder": "NIXPACKS",
-    "buildCommand": "npm install && cd apps/api && npm install && npm run build"
+    "buildCommand": "npm install && cd apps/api && npm install && npm run build",
+    "variables": {
+      "NODE_VERSION": "22"
+    }
   },
   "deploy": {
     "startCommand": "cd apps/api && node dist/main",
