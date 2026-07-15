@@ -1,4 +1,4 @@
-FROM node:22-alpine AS build
+FROM node:22-alpine
 
 WORKDIR /app
 
@@ -7,7 +7,7 @@ COPY package.json package-lock.json ./
 COPY apps/api/package.json ./apps/api/
 COPY libs/shared/package.json ./libs/shared/
 
-# Install dependencies
+# Install all dependencies
 RUN npm ci --legacy-peer-deps
 
 # Copy source code
@@ -16,15 +16,8 @@ COPY . .
 # Build API
 RUN npm run build --workspace=apps/api
 
-# Production stage
-FROM node:22-alpine
-
-WORKDIR /app
-
-# Copy built files
-COPY --from=build /app/apps/api/dist ./apps/api/dist
-COPY --from=build /app/node_modules ./node_modules
-COPY --from=build /app/apps/api/package.json ./apps/api/
+# Remove dev dependencies
+RUN npm prune --omit=dev
 
 # Set working directory to API
 WORKDIR /app/apps/api
