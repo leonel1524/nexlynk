@@ -78,6 +78,37 @@ import { Location, DAYS_OF_WEEK } from '@nexlynk/shared';
             </div>
           </div>
 
+          <!-- Google Maps URL -->
+          <div>
+            <label for="mapsUrl" class="label">Enlace de Google Maps</label>
+            <div class="flex items-center gap-2">
+              <input
+                id="mapsUrl"
+                type="url"
+                formControlName="mapsUrl"
+                class="input-field flex-1"
+                placeholder="https://www.google.com/maps/place/..."
+                (blur)="parseGoogleMapsUrl()"
+              />
+              <button
+                type="button"
+                (click)="parseGoogleMapsUrl()"
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg text-sm font-medium transition-colors whitespace-nowrap"
+              >
+                Detectar
+              </button>
+            </div>
+            <p class="text-xs text-gray-400 mt-1">Pega un enlace de Google Maps para auto-completar las coordenadas</p>
+            @if (mapsParsed) {
+              <p class="text-xs text-green-600 mt-1 flex items-center gap-1">
+                <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"/>
+                </svg>
+                Coordenadas detectadas
+              </p>
+            }
+          </div>
+
           <div class="grid grid-cols-2 gap-4">
             <div>
               <label for="latitude" class="label">Latitud</label>
@@ -151,6 +182,7 @@ export class LocationFormComponent implements OnInit {
   locationId: string | null = null;
   isEditing = false;
   isLoading = false;
+  mapsParsed = false;
   daysOfWeek = DAYS_OF_WEEK;
 
   constructor(
@@ -169,6 +201,7 @@ export class LocationFormComponent implements OnInit {
       address: ['', Validators.required],
       phone: [''],
       whatsapp: [''],
+      mapsUrl: [''],
       latitude: [null],
       longitude: [null],
       is_main: [false],
@@ -179,10 +212,59 @@ export class LocationFormComponent implements OnInit {
   ngOnInit(): void {
     this.businessId = this.route.snapshot.paramMap.get('id') || '';
     this.locationId = this.route.snapshot.paramMap.get('locationId');
-    
+
     if (this.locationId) {
       this.isEditing = true;
     }
+  }
+
+  parseGoogleMapsUrl(): void {
+    const url = this.locationForm.get('mapsUrl')?.value;
+    if (!url) return;
+
+    const coords = this.extractCoordinatesFromGoogleMapsUrl(url);
+    if (coords) {
+      this.locationForm.patchValue({
+        latitude: coords.lat,
+        longitude: coords.lng
+      });
+      this.mapsParsed = true;
+    }
+  }
+
+  private extractCoordinatesFromGoogleMapsUrl(url: string): { lat: number; lng: number } | null {
+    // Pattern 1: @lat,lng,zoomz (most common share format)
+    // e.g., https://www.google.com/maps/place/.../@10.4806,-66.9036,15z
+    const atPattern = /@(-?\d+\.?\d*),(-?\d+\.?\d*)/;
+    const atMatch = url.match(atPattern);
+    if (atMatch) {
+      return { lat: parseFloat(atMatch[1]), lng: parseFloat(atMatch[2]) };
+    }
+
+    // Pattern 2: q=lat,lng (direct coordinate search)
+    // e.g., https://www.google.com/maps?q=10.4806,-66.9036
+    const qPattern = /[?&]q=(-?\d+\.?\d*),(-?\d+\.?\d*)/;
+    const qMatch = url.match(qPattern);
+    if (qMatch) {
+      return { lat: parseFloat(qMatch[1]), lng: parseFloat(qMatch[2]) };
+    }
+
+    // Pattern 3: !2d and !3d (embedded format)
+    // e.g., https://www.google.com/maps/place/.../data=!3d10.4806!2d-66.9036
+    const exPattern = /!3d(-?\d+\.?\d*)!2d(-?\d+\.?\d*)/;
+    const exMatch = url.match(exPattern);
+    if (exMatch) {
+      return { lat: parseFloat(exMatch[1]), lng: parseFloat(exMatch[2]) };
+    }
+
+    // Pattern 4: /maps/@lat,lng (shorter format)
+    const mapsPattern = /maps\/@(-?\d+\.?\d*),(-?\d+\.?\d*)/;
+    const mapsMatch = url.match(mapsPattern);
+    if (mapsMatch) {
+      return { lat: parseFloat(mapsMatch[1]), lng: parseFloat(mapsMatch[2]) };
+    }
+
+    return null;
   }
 
   onSubmit(): void {
@@ -191,6 +273,9 @@ export class LocationFormComponent implements OnInit {
     this.isLoading = true;
 
     const formValue = { ...this.locationForm.value };
+    // Remove mapsUrl before sending to API
+    delete formValue.mapsUrl;
+
     // Convert schedule object to proper format
     const schedule: Record<string, string> = {};
     Object.entries(formValue.schedule).forEach(([day, value]) => {
