@@ -92,6 +92,18 @@ export class AuthService {
       throw new InternalServerErrorException('Error al crear el usuario');
     }
 
+    // Ensure user exists in public.users (FK for businesses.owner_id depends on it)
+    const { error: profileError } = await this.supabaseService.client
+      .from('users')
+      .upsert(
+        { id: data.user.id, email: data.user.email!, name: name || null },
+        { onConflict: 'id' }
+      );
+
+    if (profileError) {
+      console.error('⚠️ Upsert user profile during register failed:', JSON.stringify(profileError));
+    }
+
     // Create business if name provided (DB operation → service_role)
     if (businessName) {
       const slug = this.generateSlug(businessName);
