@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from '../common/supabase/supabase.service';
 import { CreateMenuDto, UpdateMenuDto, UpdateMenuItemDto } from './dto/menu.dto';
 
@@ -26,7 +26,10 @@ export class MenusService {
       .eq('business_id', businessId)
       .order('sort_order');
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Find menus error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al obtener menús');
+    }
     return data;
   }
 
@@ -78,7 +81,10 @@ export class MenusService {
       .select()
       .single();
 
-    if (menuError) throw menuError;
+    if (menuError) {
+      console.error('❌ Create menu error:', JSON.stringify(menuError));
+      throw new InternalServerErrorException('Error al crear el menú');
+    }
 
     // Create categories and items
     if (categories?.length) {
@@ -128,7 +134,10 @@ export class MenusService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Update menu error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al actualizar el menú');
+    }
     return data;
   }
 
@@ -145,7 +154,10 @@ export class MenusService {
       .eq('id', id)
       .eq('business_id', businessId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Delete menu error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al eliminar el menú');
+    }
     return { message: 'Menú eliminado correctamente' };
   }
 
@@ -162,7 +174,10 @@ export class MenusService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Update menu item error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al actualizar el item');
+    }
     return data;
   }
 
@@ -176,7 +191,10 @@ export class MenusService {
       .delete()
       .eq('id', itemId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Delete menu item error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al eliminar el item');
+    }
     return { message: 'Item eliminado correctamente' };
   }
 

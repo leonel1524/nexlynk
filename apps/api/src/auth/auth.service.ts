@@ -1,4 +1,4 @@
-import { Injectable, UnauthorizedException, ConflictException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, InternalServerErrorException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../common/supabase/supabase.service';
@@ -16,51 +16,45 @@ export class AuthService {
     const { email, password } = loginDto;
 
     if (!this.supabaseService.isConfigured) {
-      // Mock mode for development
       return this.mockLogin(email);
     }
 
-    // Authenticate with Supabase
-    const { data, error } = await this.supabaseService.client.auth.signInWithPassword({
+    // Auth operations use the ANON client
+    const { data, error } = await this.supabaseService.authClient.auth.signInWithPassword({
       email,
       password,
     });
 
     if (error) {
+      console.error('❌ Login failed:', error.message);
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
-    // Ensure user profile exists in public.users (upsert in case trigger didn't fire)
-    console.log(`📝 Upserting user profile for: ${data.user.id}`);
-    const { data: upsertResult, error: upsertError } = await this.supabaseService.client
+    // DB operations use the SERVICE_ROLE client (bypasses RLS)
+    const { error: upsertError } = await this.supabaseService.client
       .from('users')
       .upsert(
         { id: data.user.id, email: data.user.email!, name: data.user.user_metadata?.name || null },
         { onConflict: 'id' }
-      )
-      .select();
+      );
 
     if (upsertError) {
       console.error('⚠️ Upsert user profile failed (non-blocking):', JSON.stringify(upsertError));
-    } else {
-      console.log('✅ User profile upserted:', upsertResult);
     }
 
-    // Get user profile (may not exist if upsert failed)
     const { data: profile } = await this.supabaseService.client
       .from('users')
       .select('*')
       .eq('id', data.user.id)
       .single();
 
-    // Generate JWT
     const token = this.generateToken(data.user.id, data.user.email!);
 
     return {
       user: {
         id: data.user.id,
         email: data.user.email!,
-        name: profile?.name,
+        name: profile?.name || data.user.user_metadata?.name,
         plan: profile?.plan || 'free',
       },
       tokens: {
@@ -74,12 +68,11 @@ export class AuthService {
     const { email, password, name, businessName } = registerDto;
 
     if (!this.supabaseService.isConfigured) {
-      // Mock mode for development
       return this.mockRegister(email, name, businessName);
     }
 
-    // Register with Supabase Auth
-    const { data, error } = await this.supabaseService.client.auth.signUp({
+    // Auth operations use the ANON client
+    const { data, error } = await this.supabaseService.authClient.auth.signUp({
       email,
       password,
       options: {
@@ -88,23 +81,21 @@ export class AuthService {
     });
 
     if (error) {
+      console.error('❌ Register failed:', error.message);
       if (error.message.includes('already registered')) {
         throw new ConflictException('El correo ya está registrado');
       }
-      throw new Error(error.message);
+      throw new InternalServerErrorException(error.message);
     }
 
     if (!data.user) {
-      throw new Error('Error al crear el usuario');
+      throw new InternalServerErrorException('Error al crear el usuario');
     }
 
-    // User profile is auto-created by the trigger on auth.users
-    // No need to insert into public.users manually
-
-    // Create business if name provided
+    // Create business if name provided (DB operation → service_role)
     if (businessName) {
       const slug = this.generateSlug(businessName);
-      await this.supabaseService.client
+      const { error: bizError } = await this.supabaseService.client
         .from('businesses')
         .insert({
           owner_id: data.user.id,
@@ -113,9 +104,12 @@ export class AuthService {
           is_active: true,
           plan: 'free',
         });
+
+      if (bizError) {
+        console.error('⚠️ Business creation during register failed:', JSON.stringify(bizError));
+      }
     }
 
-    // Generate JWT
     const token = this.generateToken(data.user.id, email);
 
     return {
@@ -143,8 +137,8 @@ export class AuthService {
       .eq('id', userId)
       .single();
 
-    if (error) {
-      throw new UnauthorizedException('Usuario no encontrado');
+    if (error || !data) {
+      return { id: userId, email: null, name: null, plan: 'free' };
     }
 
     return data;
@@ -169,7 +163,6 @@ export class AuthService {
       .replace(/^-+|-+$/g, '');
   }
 
-  // Mock methods for development without Supabase
   private mockLogin(email: string): AuthResponseDto {
     const token = this.generateToken('mock-user-id', email);
     return {

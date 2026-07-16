@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, BadRequestException, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from '../common/supabase/supabase.service';
 import { CreateBusinessDto, UpdateBusinessDto } from './dto/business.dto';
 
@@ -17,7 +17,10 @@ export class BusinessesService {
       .eq('owner_id', userId)
       .order('created_at', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ findAll businesses error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al obtener negocios');
+    }
     return data;
   }
 
@@ -85,10 +88,10 @@ export class BusinessesService {
       .from('businesses')
       .select('id')
       .eq('slug', slug)
-      .single();
+      .maybeSingle();
 
     if (existing) {
-      throw new Error('El slug ya está en uso');
+      throw new BadRequestException('El slug ya está en uso');
     }
 
     const { data, error } = await this.supabaseService.client
@@ -103,7 +106,10 @@ export class BusinessesService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Create business error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al crear el negocio');
+    }
     return data;
   }
 
@@ -122,7 +128,10 @@ export class BusinessesService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Update business error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al actualizar el negocio');
+    }
     return data;
   }
 
@@ -139,7 +148,10 @@ export class BusinessesService {
       .delete()
       .eq('id', id);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Delete business error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al eliminar el negocio');
+    }
     return { message: 'Negocio eliminado correctamente' };
   }
 

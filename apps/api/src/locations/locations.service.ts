@@ -1,4 +1,4 @@
-import { Injectable, NotFoundException, ForbiddenException } from '@nestjs/common';
+import { Injectable, NotFoundException, ForbiddenException, InternalServerErrorException } from '@nestjs/common';
 import { SupabaseService } from '../common/supabase/supabase.service';
 import { CreateLocationDto, UpdateLocationDto } from './dto/location.dto';
 
@@ -19,7 +19,10 @@ export class LocationsService {
       .eq('business_id', businessId)
       .order('is_main', { ascending: false });
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Find locations error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al obtener ubicaciones');
+    }
     return data;
   }
 
@@ -69,7 +72,10 @@ export class LocationsService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Create location error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al crear la ubicación');
+    }
     return data;
   }
 
@@ -98,7 +104,10 @@ export class LocationsService {
       .select()
       .single();
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Update location error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al actualizar la ubicación');
+    }
     return data;
   }
 
@@ -115,7 +124,10 @@ export class LocationsService {
       .eq('id', id)
       .eq('business_id', businessId);
 
-    if (error) throw error;
+    if (error) {
+      console.error('❌ Delete location error:', JSON.stringify(error));
+      throw new InternalServerErrorException('Error al eliminar la ubicación');
+    }
     return { message: 'Ubicación eliminada correctamente' };
   }
 
