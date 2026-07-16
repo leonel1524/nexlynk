@@ -146,9 +146,11 @@ export class MenusService {
       return this.mockUpdate(id, updateMenuDto);
     }
 
+    const { categories, ...menuData } = updateMenuDto;
+
     const { data, error } = await this.supabaseService.client
       .from('menus')
-      .update(updateMenuDto)
+      .update(menuData)
       .eq('id', id)
       .eq('business_id', businessId)
       .select()
@@ -158,7 +160,71 @@ export class MenusService {
       console.error('❌ Update menu error:', JSON.stringify(error));
       throw new InternalServerErrorException('Error al actualizar el menú');
     }
-    return data;
+
+    // If categories were sent, replace all existing categories and items
+    if (categories) {
+      // Get existing category IDs
+      const { data: existingCats } = await this.supabaseService.client
+        .from('menu_categories')
+        .select('id')
+        .eq('menu_id', id);
+
+      if (existingCats?.length) {
+        const catIds = existingCats.map(c => c.id);
+
+        // Delete existing menu_items for these categories
+        await this.supabaseService.client
+          .from('menu_items')
+          .delete()
+          .in('category_id', catIds);
+
+        // Delete existing categories
+        await this.supabaseService.client
+          .from('menu_categories')
+          .delete()
+          .eq('menu_id', id);
+      }
+
+      // Insert new categories and items
+      for (let i = 0; i < categories.length; i++) {
+        const { items, ...categoryData } = categories[i];
+
+        const { data: category, error: catError } = await this.supabaseService.client
+          .from('menu_categories')
+          .insert({
+            menu_id: id,
+            ...categoryData,
+            sort_order: i,
+          })
+          .select()
+          .single();
+
+        if (catError) {
+          console.error('❌ Update category error:', JSON.stringify(catError));
+          throw new InternalServerErrorException(`Error al actualizar categoría: ${catError.message}`);
+        }
+
+        if (category && items?.length) {
+          for (let j = 0; j < items.length; j++) {
+            const { error: itemError } = await this.supabaseService.client
+              .from('menu_items')
+              .insert({
+                category_id: category.id,
+                ...items[j],
+                is_available: true,
+                sort_order: j,
+              });
+
+            if (itemError) {
+              console.error('❌ Update menu item error:', JSON.stringify(itemError));
+              throw new InternalServerErrorException(`Error al actualizar item: ${itemError.message}`);
+            }
+          }
+        }
+      }
+    }
+
+    return this.findOne(id, businessId, userId);
   }
 
   async remove(id: string, businessId: string, userId: string) {

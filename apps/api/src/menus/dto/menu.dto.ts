@@ -80,6 +80,13 @@ export class UpdateMenuDto {
   @IsNumber()
   @IsOptional()
   sort_order?: number;
+
+  @ApiPropertyOptional({ type: [CreateMenuCategoryDto] })
+  @IsArray()
+  @ValidateNested({ each: true })
+  @Type(() => CreateMenuCategoryDto)
+  @IsOptional()
+  categories?: CreateMenuCategoryDto[];
 }
 
 export class UpdateMenuItemDto {
