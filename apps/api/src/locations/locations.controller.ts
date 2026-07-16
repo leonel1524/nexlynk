@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { LocationsService } from './locations.service';
 import { CreateLocationDto, UpdateLocationDto } from './dto/location.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { apiResponse, apiMessage } from '../common/dto/api-response';
 
 @ApiTags('locations')
 @Controller('businesses/:businessId/locations')
@@ -15,7 +16,8 @@ export class LocationsController {
   @ApiOperation({ summary: 'Obtener todas las ubicaciones de un negocio' })
   @ApiResponse({ status: 200, description: 'Lista de ubicaciones' })
   async findAll(@Param('businessId') businessId: string, @Request() req: any) {
-    return this.locationsService.findAll(businessId, req.user.id);
+    const data = await this.locationsService.findAll(businessId, req.user.id);
+    return apiResponse(data);
   }
 
   @Get(':id')
@@ -27,7 +29,8 @@ export class LocationsController {
     @Param('businessId') businessId: string,
     @Request() req: any,
   ) {
-    return this.locationsService.findOne(id, businessId, req.user.id);
+    const data = await this.locationsService.findOne(id, businessId, req.user.id);
+    return apiResponse(data);
   }
 
   @Post()
@@ -38,7 +41,8 @@ export class LocationsController {
     @Body() createLocationDto: CreateLocationDto,
     @Request() req: any,
   ) {
-    return this.locationsService.create(businessId, req.user.id, createLocationDto);
+    const data = await this.locationsService.create(businessId, req.user.id, createLocationDto);
+    return apiResponse(data);
   }
 
   @Put(':id')
@@ -51,7 +55,8 @@ export class LocationsController {
     @Body() updateLocationDto: UpdateLocationDto,
     @Request() req: any,
   ) {
-    return this.locationsService.update(id, businessId, req.user.id, updateLocationDto);
+    const data = await this.locationsService.update(id, businessId, req.user.id, updateLocationDto);
+    return apiResponse(data);
   }
 
   @Delete(':id')
@@ -63,6 +68,7 @@ export class LocationsController {
     @Param('businessId') businessId: string,
     @Request() req: any,
   ) {
-    return this.locationsService.remove(id, businessId, req.user.id);
+    await this.locationsService.remove(id, businessId, req.user.id);
+    return apiMessage('Ubicación eliminada correctamente');
   }
 }

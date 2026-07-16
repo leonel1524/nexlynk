@@ -3,6 +3,7 @@ import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagg
 import { MenusService } from './menus.service';
 import { CreateMenuDto, UpdateMenuDto, UpdateMenuItemDto } from './dto/menu.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
+import { apiResponse, apiMessage } from '../common/dto/api-response';
 
 @ApiTags('menus')
 @Controller('businesses/:businessId/menus')
@@ -15,7 +16,8 @@ export class MenusController {
   @ApiOperation({ summary: 'Obtener todos los menús de un negocio' })
   @ApiResponse({ status: 200, description: 'Lista de menús' })
   async findAll(@Param('businessId') businessId: string, @Request() req: any) {
-    return this.menusService.findAll(businessId, req.user.id);
+    const data = await this.menusService.findAll(businessId, req.user.id);
+    return apiResponse(data);
   }
 
   @Get(':id')
@@ -27,7 +29,8 @@ export class MenusController {
     @Param('businessId') businessId: string,
     @Request() req: any,
   ) {
-    return this.menusService.findOne(id, businessId, req.user.id);
+    const data = await this.menusService.findOne(id, businessId, req.user.id);
+    return apiResponse(data);
   }
 
   @Post()
@@ -38,7 +41,8 @@ export class MenusController {
     @Body() createMenuDto: CreateMenuDto,
     @Request() req: any,
   ) {
-    return this.menusService.create(businessId, req.user.id, createMenuDto);
+    const data = await this.menusService.create(businessId, req.user.id, createMenuDto);
+    return apiResponse(data);
   }
 
   @Put(':id')
@@ -51,7 +55,8 @@ export class MenusController {
     @Body() updateMenuDto: UpdateMenuDto,
     @Request() req: any,
   ) {
-    return this.menusService.update(id, businessId, req.user.id, updateMenuDto);
+    const data = await this.menusService.update(id, businessId, req.user.id, updateMenuDto);
+    return apiResponse(data);
   }
 
   @Delete(':id')
@@ -63,7 +68,8 @@ export class MenusController {
     @Param('businessId') businessId: string,
     @Request() req: any,
   ) {
-    return this.menusService.remove(id, businessId, req.user.id);
+    await this.menusService.remove(id, businessId, req.user.id);
+    return apiMessage('Menú eliminado correctamente');
   }
 
   // Menu Items
@@ -73,12 +79,14 @@ export class MenusController {
     @Param('itemId') itemId: string,
     @Body() dto: UpdateMenuItemDto,
   ) {
-    return this.menusService.updateItem(itemId, dto);
+    const data = await this.menusService.updateItem(itemId, dto);
+    return apiResponse(data);
   }
 
   @Delete('items/:itemId')
   @ApiOperation({ summary: 'Eliminar un item del menú' })
   async removeItem(@Param('itemId') itemId: string) {
-    return this.menusService.removeItem(itemId);
+    await this.menusService.removeItem(itemId);
+    return apiMessage('Item eliminado correctamente');
   }
 }
