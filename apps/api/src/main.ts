@@ -17,6 +17,7 @@ async function bootstrap() {
       'https://nexlynk.app',
       'https://*.vercel.app',
       'https://*.pages.dev',
+      'https://nexlynk-admin.vercel.app'
     ],
     credentials: true,
   });
