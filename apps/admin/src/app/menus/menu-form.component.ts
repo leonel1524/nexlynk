@@ -95,18 +95,24 @@ import { BusinessService } from '../shared/services/business.service';
                   </div>
 
                   @for (item of getCategoryItems(i).controls; track $index; let j = $index) {
-                    <div [formGroupName]="j" class="flex items-center gap-2 bg-gray-50 rounded-lg p-3">
-                      <div class="flex-1">
-                        <input type="text" formControlName="name" class="input-field text-sm" placeholder="Nombre del item" />
+                    <div [formGroupName]="j" class="bg-white border border-gray-200 rounded-lg p-3 space-y-2">
+                      <div class="flex items-center gap-2">
+                        <div class="flex-1">
+                          <input type="text" formControlName="name" class="input-field text-sm" placeholder="Nombre del producto" />
+                        </div>
+                        <div class="w-28">
+                          <input type="number" formControlName="price" class="input-field text-sm" placeholder="Precio" step="0.01" />
+                        </div>
+                        <button type="button" (click)="removeItem(i, j)" class="text-red-400 hover:text-red-500 p-1">
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+                          </svg>
+                        </button>
                       </div>
-                      <div class="w-24">
-                        <input type="number" formControlName="price" class="input-field text-sm" placeholder="Precio" step="0.01" />
+                      <div class="flex items-center gap-2">
+                        <input type="text" formControlName="description" class="input-field text-xs flex-1" placeholder="Descripción del producto (opcional)" />
+                        <input type="url" formControlName="image_url" class="input-field text-xs flex-1" placeholder="URL de imagen (opcional)" />
                       </div>
-                      <button type="button" (click)="removeItem(i, j)" class="text-red-400 hover:text-red-500 p-1">
-                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
-                        </svg>
-                      </button>
                     </div>
                   }
                 </div>
@@ -190,7 +196,7 @@ export class MenuFormComponent implements OnInit {
               const itemsArray = catForm.get('items') as FormArray;
               if (cat.menu_items) {
                 for (const item of cat.menu_items) {
-                  itemsArray.push(this.createItemForm(item.name, item.price));
+                  itemsArray.push(this.createItemForm(item.name, item.price, item.description, item.image_url));
                 }
               }
 
@@ -210,11 +216,12 @@ export class MenuFormComponent implements OnInit {
     });
   }
 
-  createItemForm(name = '', price: number | null = null): FormGroup {
+  createItemForm(name = '', price: number | null = null, description = '', imageUrl = ''): FormGroup {
     return this.fb.group({
       name: [name, Validators.required],
-      description: [''],
-      price: [price]
+      description: [description],
+      price: [price],
+      image_url: [imageUrl]
     });
   }
 

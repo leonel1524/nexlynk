@@ -21,6 +21,11 @@ export class CreateBusinessDto {
   @IsOptional()
   description?: string;
 
+  @ApiPropertyOptional({ example: 'restaurante' })
+  @IsString()
+  @IsOptional()
+  business_type?: string;
+
   @ApiPropertyOptional()
   @IsString()
   @IsOptional()
@@ -70,6 +75,11 @@ export class UpdateBusinessDto {
   @IsString()
   @IsOptional()
   description?: string;
+
+  @ApiPropertyOptional()
+  @IsString()
+  @IsOptional()
+  business_type?: string;
 
   @ApiPropertyOptional()
   @IsString()

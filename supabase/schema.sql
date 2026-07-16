@@ -28,6 +28,7 @@ CREATE TABLE businesses (
   slug TEXT UNIQUE NOT NULL,
   name TEXT NOT NULL,
   description TEXT,
+  business_type TEXT,
   logo_url TEXT,
   cover_url TEXT,
   phone TEXT,

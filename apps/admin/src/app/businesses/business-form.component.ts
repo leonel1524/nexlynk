@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BusinessService } from '../shared/services/business.service';
-import { Business } from '@nexlynk/shared';
+import { Business, BUSINESS_TYPES } from '@nexlynk/shared';
 import { Subscription } from 'rxjs';
 
 @Component({
@@ -65,6 +65,20 @@ import { Subscription } from 'rxjs';
               rows="3"
               placeholder="Describe tu negocio..."
             ></textarea>
+          </div>
+
+          <div>
+            <label for="business_type" class="label">Tipo de negocio</label>
+            <select
+              id="business_type"
+              formControlName="business_type"
+              class="input-field"
+            >
+              <option value="">Seleccionar tipo...</option>
+              @for (type of businessTypes; track type.value) {
+                <option [value]="type.value">{{ type.label }}</option>
+              }
+            </select>
           </div>
 
           <div class="grid grid-cols-2 gap-4">
@@ -136,6 +150,7 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
   businessId: string | null = null;
   isLoading = false;
   errorMessage = '';
+  businessTypes = BUSINESS_TYPES;
   private slugSubscription?: Subscription;
 
   constructor(
@@ -148,6 +163,7 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
       name: ['', Validators.required],
       slug: ['', [Validators.pattern(/^[a-z0-9-]*$/)]],
       description: [''],
+      business_type: [''],
       phone: [''],
       whatsapp: [''],
       email: ['', Validators.email],

@@ -127,6 +127,22 @@ export const DAYS_OF_WEEK = [
   'domingo',
 ] as const;
 
+// Business types
+export const BUSINESS_TYPES = [
+  { value: 'restaurante', label: 'Restaurante / Comida' },
+  { value: 'tienda_ropa', label: 'Tienda de ropa' },
+  { value: 'tienda_articulos', label: 'Tienda de artículos' },
+  { value: 'farmacia', label: 'Farmacia' },
+  { value: 'supermercado', label: 'Supermercado' },
+  { value: 'panaderia', label: 'Panadería' },
+  { value: 'peluqueria', label: 'Peluquería / Belleza' },
+  { value: 'servicios', label: 'Servicios profesionales' },
+  { value: 'tecnologia', label: 'Tecnología' },
+  { value: 'otro', label: 'Otro' },
+] as const;
+
+export type BusinessType = typeof BUSINESS_TYPES[number]['value'];
+
 // Validation constants
 export const VALIDATION = {
   slug_pattern: /^[a-z0-9-]+$/,

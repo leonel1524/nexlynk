@@ -5,6 +5,7 @@ export interface Business {
   slug: string;
   name: string;
   description?: string;
+  business_type?: string;
   logo_url?: string;
   cover_url?: string;
   phone?: string;
