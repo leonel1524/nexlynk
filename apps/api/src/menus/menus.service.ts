@@ -91,7 +91,7 @@ export class MenusService {
       for (let i = 0; i < categories.length; i++) {
         const { items, ...categoryData } = categories[i];
 
-        const { data: category } = await this.supabaseService.client
+        const { data: category, error: catError } = await this.supabaseService.client
           .from('menu_categories')
           .insert({
             menu_id: menu.id,
@@ -101,9 +101,14 @@ export class MenusService {
           .select()
           .single();
 
+        if (catError) {
+          console.error('❌ Create category error:', JSON.stringify(catError));
+          throw new InternalServerErrorException(`Error al crear categoría: ${catError.message}`);
+        }
+
         if (category && items?.length) {
           for (let j = 0; j < items.length; j++) {
-            await this.supabaseService.client
+            const { error: itemError } = await this.supabaseService.client
               .from('menu_items')
               .insert({
                 category_id: category.id,
@@ -111,6 +116,11 @@ export class MenusService {
                 is_available: true,
                 sort_order: j,
               });
+
+            if (itemError) {
+              console.error('❌ Create menu item error:', JSON.stringify(itemError));
+              throw new InternalServerErrorException(`Error al crear item: ${itemError.message}`);
+            }
           }
         }
       }
