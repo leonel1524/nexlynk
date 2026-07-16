@@ -67,7 +67,12 @@ export class MenusService {
       return this.mockCreate(createMenuDto);
     }
 
+    console.log('📝 Create menu DTO:', JSON.stringify(createMenuDto, null, 2));
+
     const { categories, ...menuData } = createMenuDto;
+
+    console.log('📝 Menu data (without categories):', JSON.stringify(menuData));
+    console.log('📝 Categories count:', categories?.length || 0);
 
     // Create menu
     const { data: menu, error: menuError } = await this.supabaseService.client
@@ -85,6 +90,8 @@ export class MenusService {
       console.error('❌ Create menu error:', JSON.stringify(menuError));
       throw new InternalServerErrorException('Error al crear el menú');
     }
+
+    console.log('✅ Menu created:', menu.id, menu.name);
 
     // Create categories and items
     if (categories?.length) {
