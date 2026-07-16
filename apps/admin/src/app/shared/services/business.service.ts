@@ -39,6 +39,10 @@ export class BusinessService {
     return this.http.get<ApiResponse<Menu[]>>(`${this.API_URL}/${businessId}/menus`);
   }
 
+  getMenuById(businessId: string, menuId: string): Observable<ApiResponse<Menu>> {
+    return this.http.get<ApiResponse<Menu>>(`${this.API_URL}/${businessId}/menus/${menuId}`);
+  }
+
   createMenu(businessId: string, menu: Partial<Menu>): Observable<ApiResponse<Menu>> {
     return this.http.post<ApiResponse<Menu>>(`${this.API_URL}/${businessId}/menus`, menu);
   }

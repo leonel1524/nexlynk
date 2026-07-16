@@ -1,9 +1,10 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BusinessService } from '../shared/services/business.service';
 import { Business } from '@nexlynk/shared';
+import { Subscription } from 'rxjs';
 
 @Component({
   selector: 'app-business-form',
@@ -41,7 +42,7 @@ import { Business } from '@nexlynk/shared';
           </div>
 
           <div>
-            <label for="slug" class="label">URL del negocio *</label>
+            <label for="slug" class="label">URL del negocio</label>
             <div class="flex items-center gap-2">
               <span class="text-gray-500">nexlynk.app/</span>
               <input
@@ -49,12 +50,10 @@ import { Business } from '@nexlynk/shared';
                 type="text"
                 formControlName="slug"
                 class="input-field flex-1"
-                placeholder="mi-negocio"
+                placeholder="se-genera-automaticamente"
               />
             </div>
-            @if (businessForm.get('slug')?.invalid && businessForm.get('slug')?.touched) {
-              <p class="error-text">El slug es requerido (solo letras minúsculas, números y guiones)</p>
-            }
+            <p class="text-xs text-gray-400 mt-1">Si lo dejas vacío, se genera automáticamente del nombre</p>
           </div>
 
           <div>
@@ -131,12 +130,13 @@ import { Business } from '@nexlynk/shared';
     </div>
   `
 })
-export class BusinessFormComponent implements OnInit {
+export class BusinessFormComponent implements OnInit, OnDestroy {
   businessForm: FormGroup;
   isEditing = false;
   businessId: string | null = null;
   isLoading = false;
   errorMessage = '';
+  private slugSubscription?: Subscription;
 
   constructor(
     private fb: FormBuilder,
@@ -146,7 +146,7 @@ export class BusinessFormComponent implements OnInit {
   ) {
     this.businessForm = this.fb.group({
       name: ['', Validators.required],
-      slug: ['', [Validators.required, Validators.pattern(/^[a-z0-9-]+$/)]],
+      slug: ['', [Validators.pattern(/^[a-z0-9-]*$/)]],
       description: [''],
       phone: [''],
       whatsapp: [''],
@@ -161,6 +161,27 @@ export class BusinessFormComponent implements OnInit {
       this.isEditing = true;
       this.loadBusiness();
     }
+
+    // Auto-generate slug from name
+    this.slugSubscription = this.businessForm.get('name')?.valueChanges.subscribe((name: string) => {
+      if (!this.isEditing && !this.businessForm.get('slug')?.value) {
+        const slug = this.generateSlug(name);
+        this.businessForm.get('slug')?.setValue(slug, { emitEvent: false });
+      }
+    });
+  }
+
+  ngOnDestroy(): void {
+    this.slugSubscription?.unsubscribe();
+  }
+
+  private generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   loadBusiness(): void {
