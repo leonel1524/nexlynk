@@ -31,18 +31,22 @@ export class AuthService {
     }
 
     // Ensure user profile exists in public.users (upsert in case trigger didn't fire)
-    const { error: upsertError } = await this.supabaseService.client
+    console.log(`📝 Upserting user profile for: ${data.user.id}`);
+    const { data: upsertResult, error: upsertError } = await this.supabaseService.client
       .from('users')
       .upsert(
         { id: data.user.id, email: data.user.email!, name: data.user.user_metadata?.name || null },
         { onConflict: 'id' }
-      );
+      )
+      .select();
 
     if (upsertError) {
-      console.error('Failed to upsert user profile:', upsertError);
+      console.error('⚠️ Upsert user profile failed (non-blocking):', JSON.stringify(upsertError));
+    } else {
+      console.log('✅ User profile upserted:', upsertResult);
     }
 
-    // Get user profile
+    // Get user profile (may not exist if upsert failed)
     const { data: profile } = await this.supabaseService.client
       .from('users')
       .select('*')
