@@ -30,6 +30,18 @@ export class AuthService {
       throw new UnauthorizedException('Credenciales inválidas');
     }
 
+    // Ensure user profile exists in public.users (upsert in case trigger didn't fire)
+    const { error: upsertError } = await this.supabaseService.client
+      .from('users')
+      .upsert(
+        { id: data.user.id, email: data.user.email!, name: data.user.user_metadata?.name || null },
+        { onConflict: 'id' }
+      );
+
+    if (upsertError) {
+      console.error('Failed to upsert user profile:', upsertError);
+    }
+
     // Get user profile
     const { data: profile } = await this.supabaseService.client
       .from('users')

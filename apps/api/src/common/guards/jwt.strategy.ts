@@ -32,13 +32,33 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       return { id: sub, email };
     }
 
-    const { data: user, error } = await this.supabaseService.client
+    // Try to find the user in public.users
+    let { data: user, error } = await this.supabaseService.client
       .from('users')
       .select('*')
       .eq('id', sub)
       .single();
 
+    // If user not found, create the profile (in case trigger didn't fire)
     if (error || !user) {
+      const { error: insertError } = await this.supabaseService.client
+        .from('users')
+        .upsert(
+          { id: sub, email },
+          { onConflict: 'id' }
+        );
+
+      if (!insertError) {
+        const { data: newUser } = await this.supabaseService.client
+          .from('users')
+          .select('*')
+          .eq('id', sub)
+          .single();
+        user = newUser;
+      }
+    }
+
+    if (!user) {
       throw new UnauthorizedException('Usuario no encontrado');
     }
 

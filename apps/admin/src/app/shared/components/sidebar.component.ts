@@ -1,6 +1,7 @@
 import { Component } from '@angular/core';
-import { RouterLink, RouterLinkActive } from '@angular/router';
+import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
+import { AuthService } from '../services/auth.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -57,13 +58,13 @@ import { CommonModule } from '@angular/common';
       <div class="p-4 border-t border-gray-200">
         <div class="flex items-center gap-3">
           <div class="w-10 h-10 bg-gray-200 rounded-full flex items-center justify-center">
-            <span class="text-gray-600 font-medium">U</span>
+            <span class="text-gray-600 font-medium">{{ userInitial }}</span>
           </div>
           <div class="flex-1 min-w-0">
-            <p class="text-sm font-medium text-gray-900 truncate">Usuario</p>
-            <p class="text-xs text-gray-500 truncate">usuario&#64;nexlynk.app</p>
+            <p class="text-sm font-medium text-gray-900 truncate">{{ userName }}</p>
+            <p class="text-xs text-gray-500 truncate">{{ userEmail }}</p>
           </div>
-          <button class="text-gray-400 hover:text-gray-600">
+          <button (click)="logout()" class="text-gray-400 hover:text-gray-600" title="Cerrar sesión">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
             </svg>
@@ -73,4 +74,24 @@ import { CommonModule } from '@angular/common';
     </aside>
   `
 })
-export class SidebarComponent {}
+export class SidebarComponent {
+  constructor(private authService: AuthService, private router: Router) {}
+
+  get userName(): string {
+    return this.authService.currentUser?.name || 'Usuario';
+  }
+
+  get userEmail(): string {
+    return this.authService.currentUser?.email || '';
+  }
+
+  get userInitial(): string {
+    const name = this.userName;
+    return name.charAt(0).toUpperCase();
+  }
+
+  logout(): void {
+    this.authService.logout();
+    this.router.navigate(['/login']);
+  }
+}

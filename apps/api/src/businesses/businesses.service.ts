@@ -77,11 +77,14 @@ export class BusinessesService {
       return this.mockCreate(createBusinessDto);
     }
 
+    // Auto-generate slug from name if not provided
+    const slug = createBusinessDto.slug || this.generateSlug(createBusinessDto.name);
+
     // Check if slug is unique
     const { data: existing } = await this.supabaseService.client
       .from('businesses')
       .select('id')
-      .eq('slug', createBusinessDto.slug)
+      .eq('slug', slug)
       .single();
 
     if (existing) {
@@ -93,6 +96,7 @@ export class BusinessesService {
       .insert({
         owner_id: userId,
         ...createBusinessDto,
+        slug,
         is_active: true,
         plan: 'free',
       })
@@ -137,6 +141,15 @@ export class BusinessesService {
 
     if (error) throw error;
     return { message: 'Negocio eliminado correctamente' };
+  }
+
+  private generateSlug(text: string): string {
+    return text
+      .toLowerCase()
+      .trim()
+      .replace(/[^\w\s-]/g, '')
+      .replace(/[\s_-]+/g, '-')
+      .replace(/^-+|-+$/g, '');
   }
 
   // Mock methods for development

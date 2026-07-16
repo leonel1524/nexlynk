@@ -8,12 +8,13 @@ export class CreateBusinessDto {
   @MaxLength(100)
   name: string;
 
-  @ApiProperty({ example: 'mi-negocio' })
+  @ApiPropertyOptional({ example: 'mi-negocio' })
   @IsString()
+  @IsOptional()
   @MinLength(3)
   @MaxLength(30)
   @Matches(/^[a-z0-9-]+$/, { message: 'El slug solo puede contener letras minúsculas, números y guiones' })
-  slug: string;
+  slug?: string;
 
   @ApiPropertyOptional({ example: 'Descripción del negocio' })
   @IsString()
