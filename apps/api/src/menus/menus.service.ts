@@ -61,13 +61,16 @@ export class MenusService {
   }
 
   async create(businessId: string, userId: string, createMenuDto: CreateMenuDto) {
+    console.log('🔥 MENUS SERVICE CREATE called. businessId:', businessId, 'userId:', userId);
+    console.log('📝 Create menu DTO:', JSON.stringify(createMenuDto, null, 2));
+
     await this.verifyOwnership(businessId, userId);
+    console.log('✅ Ownership verified');
 
     if (!this.supabaseService.isConfigured) {
+      console.log('⚠️ Supabase not configured, using mock');
       return this.mockCreate(createMenuDto);
     }
-
-    console.log('📝 Create menu DTO:', JSON.stringify(createMenuDto, null, 2));
 
     const { categories, ...menuData } = createMenuDto;
 
