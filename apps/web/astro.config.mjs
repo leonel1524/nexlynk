@@ -5,7 +5,7 @@ import cloudflare from '@astrojs/cloudflare';
 
 export default defineConfig({
   output: 'server',
-  integrations: [tailwind(), react()],
+  integrations: [tailwind({ applyBaseStyles: false }), react()],
   adapter: cloudflare(),
   server: {
     port: 4200,

@@ -25,8 +25,7 @@ export class BusinessesController {
   @ApiResponse({ status: 200, description: 'Negocio con menús y ubicaciones' })
   @ApiResponse({ status: 404, description: 'Negocio no encontrado' })
   async findBySlug(@Param('slug') slug: string) {
-    const data = await this.businessesService.findBySlug(slug);
-    return apiResponse(data);
+    return this.businessesService.findBySlug(slug);
   }
 
   @Get(':id')
