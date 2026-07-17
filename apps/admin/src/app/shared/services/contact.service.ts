@@ -17,6 +17,6 @@ export class ContactService {
   }
 
   markAsRead(businessId: string, messageId: string): Observable<ApiResponse<ContactMessage>> {
-    return this.http.patch<ApiResponse<ContactMessage>>(`${this.API_URL}/${businessId}/contact/${messageId}/read`);
+    return this.http.patch<ApiResponse<ContactMessage>>(`${this.API_URL}/${businessId}/contact/${messageId}/read`, {});
   }
 }
