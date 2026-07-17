@@ -1,0 +1,30 @@
+---
+export interface Props {
+  href: string;
+  icon: string;
+  label: string;
+  color?: 'brand' | 'green' | 'blue';
+  external?: boolean;
+}
+
+const { href, icon, label, color = 'brand', external = false } = Astro.props;
+
+const colorClasses = {
+  brand: 'bg-brand/10 text-brand group-hover:bg-brand group-hover:text-white',
+  green: 'bg-green-500/10 text-green-600 group-hover:bg-green-500 group-hover:text-white',
+  blue: 'bg-blue-500/10 text-blue-600 group-hover:bg-blue-500 group-hover:text-white',
+};
+---
+
+<a
+  href={href}
+  class:list={[
+    'card card-hover group flex flex-col items-center justify-center gap-3 p-6 text-center transition-all duration-200',
+    external && 'target="_blank" rel="noopener noreferrer"',
+  ]}
+>
+  <div class={`w-14 h-14 rounded-2xl flex items-center justify-center transition-all duration-200 ${colorClasses[color]}`}>
+    <Fragment set:html={icon} />
+  </div>
+  <span class="font-medium text-gray-700 group-hover:text-gray-900">{label}</span>
+</a>

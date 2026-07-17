@@ -6,6 +6,7 @@ import { BusinessesModule } from './businesses/businesses.module';
 import { MenusModule } from './menus/menus.module';
 import { LocationsModule } from './locations/locations.module';
 import { AnalyticsModule } from './analytics/analytics.module';
+import { ContactModule } from './contact/contact.module';
 import { SupabaseModule } from './common/supabase/supabase.module';
 
 @Module({
@@ -19,6 +20,7 @@ import { SupabaseModule } from './common/supabase/supabase.module';
     MenusModule,
     LocationsModule,
     AnalyticsModule,
+    ContactModule,
   ],
   controllers: [HealthController],
 })

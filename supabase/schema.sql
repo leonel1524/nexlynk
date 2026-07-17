@@ -137,6 +137,20 @@ CREATE TABLE analytics_events (
   created_at TIMESTAMPTZ DEFAULT NOW()
 );
 
+-- ============================================
+-- CONTACT MESSAGES TABLE
+-- ============================================
+CREATE TABLE contact_messages (
+  id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+  business_id UUID NOT NULL REFERENCES businesses(id) ON DELETE CASCADE,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  message TEXT NOT NULL,
+  is_read BOOLEAN DEFAULT false,
+  created_at TIMESTAMPTZ DEFAULT NOW()
+);
+
 -- Create indexes for analytics queries
 CREATE INDEX idx_analytics_business ON analytics_events(business_id);
 CREATE INDEX idx_analytics_type ON analytics_events(event_type);
@@ -154,6 +168,7 @@ ALTER TABLE menus ENABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_categories ENABLE ROW LEVEL SECURITY;
 ALTER TABLE menu_items ENABLE ROW LEVEL SECURITY;
 ALTER TABLE analytics_events ENABLE ROW LEVEL SECURITY;
+ALTER TABLE contact_messages ENABLE ROW LEVEL SECURITY;
 
 -- Users policies
 CREATE POLICY "Users can view own profile" ON users
@@ -280,6 +295,20 @@ CREATE POLICY "Users can view own business analytics" ON analytics_events
     business_id IN (SELECT id FROM businesses WHERE owner_id = auth.uid())
   );
 
+-- Contact Messages policies (service role only for writes, public can insert)
+CREATE POLICY "Service role can insert contact messages" ON contact_messages
+  FOR INSERT WITH CHECK (true);
+
+CREATE POLICY "Users can view own business contact messages" ON contact_messages
+  FOR SELECT USING (
+    business_id IN (SELECT id FROM businesses WHERE owner_id = auth.uid())
+  );
+
+CREATE POLICY "Users can update own business contact messages" ON contact_messages
+  FOR UPDATE USING (
+    business_id IN (SELECT id FROM businesses WHERE owner_id = auth.uid())
+  );
+
 -- ============================================
 -- FUNCTIONS
 -- ============================================
@@ -335,3 +364,5 @@ CREATE INDEX idx_businesses_owner_active ON businesses(owner_id, is_active);
 CREATE INDEX idx_menus_business_active ON menus(business_id, is_active);
 CREATE INDEX idx_analytics_business_type ON analytics_events(business_id, event_type);
 CREATE INDEX idx_analytics_business_created ON analytics_events(business_id, created_at);
+CREATE INDEX idx_contact_messages_business ON contact_messages(business_id);
+CREATE INDEX idx_contact_messages_created ON contact_messages(created_at);
