@@ -13,7 +13,8 @@ RUN npm ci --legacy-peer-deps
 # Copy source code
 COPY . .
 
-# Build API
+# Build shared lib first, then API
+RUN npm run build --workspace=libs/shared
 RUN npm run build --workspace=apps/api
 
 # Remove dev dependencies
@@ -26,4 +27,4 @@ WORKDIR /app/apps/api
 EXPOSE 10000
 
 # Start application
-CMD ["node", "dist/apps/api/src/main.js"]
+CMD ["node", "dist/main.js"]
