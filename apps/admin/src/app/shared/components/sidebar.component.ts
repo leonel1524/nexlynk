@@ -12,9 +12,7 @@ import { AuthService } from '../services/auth.service';
       <!-- Logo -->
       <div class="p-6 border-b border-gray-200">
         <a routerLink="/dashboard" class="flex items-center gap-3">
-          <div class="w-10 h-10 bg-brand rounded-lg flex items-center justify-center">
-            <span class="text-white font-bold text-xl">N</span>
-          </div>
+          <img src="assets/isologo.png" alt="Nexlynk" class="w-10 h-10 rounded-lg" />
           <div>
             <h1 class="font-bold text-gray-900">Nexlynk</h1>
             <p class="text-xs text-gray-500">Admin Panel</p>

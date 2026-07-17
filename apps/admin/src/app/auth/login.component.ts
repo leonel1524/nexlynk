@@ -13,9 +13,7 @@ import { AuthService } from '../shared/services/auth.service';
       <div class="max-w-md w-full space-y-8">
         <div>
           <div class="flex justify-center">
-            <div class="w-16 h-16 bg-brand rounded-2xl flex items-center justify-center">
-              <span class="text-white font-bold text-3xl">N</span>
-            </div>
+            <img src="assets/isologo.png" alt="Nexlynk" class="w-16 h-16 rounded-2xl" />
           </div>
           <h2 class="mt-6 text-center text-3xl font-bold text-gray-900">
             Iniciar sesión
