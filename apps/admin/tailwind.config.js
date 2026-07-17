@@ -9,9 +9,9 @@ module.exports = {
     extend: {
       colors: {
         brand: {
-          DEFAULT: '#16a34a',
-          light: '#22c55e',
-          dark: '#15803d',
+          DEFAULT: '#232661',
+          light: '#3478F3',
+          dark: '#1a1e4d',
         },
       },
       fontFamily: {
