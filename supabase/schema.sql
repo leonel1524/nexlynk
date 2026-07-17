@@ -13,6 +13,8 @@ CREATE TABLE users (
   id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
   email TEXT UNIQUE NOT NULL,
   name TEXT,
+  phone TEXT,
+  website TEXT,
   plan TEXT DEFAULT 'free' CHECK (plan IN ('free', 'basic', 'pro', 'business', 'enterprise')),
   plan_expires_at TIMESTAMPTZ,
   created_at TIMESTAMPTZ DEFAULT NOW(),
@@ -366,3 +368,40 @@ CREATE INDEX idx_analytics_business_type ON analytics_events(business_id, event_
 CREATE INDEX idx_analytics_business_created ON analytics_events(business_id, created_at);
 CREATE INDEX idx_contact_messages_business ON contact_messages(business_id);
 CREATE INDEX idx_contact_messages_created ON contact_messages(created_at);
+
+-- ============================================
+-- SUPABASE STORAGE BUCKETS
+-- ============================================
+
+-- Create storage bucket for business assets (logos, covers, menu images)
+INSERT INTO storage.buckets (id, name, public)
+VALUES ('business-assets', 'business-assets', true)
+ON CONFLICT (id) DO NOTHING;
+
+-- Storage policy: Allow authenticated uploads
+CREATE POLICY "Allow authenticated uploads"
+ON storage.objects
+FOR INSERT
+TO authenticated
+WITH CHECK (bucket_id = 'business-assets');
+
+-- Storage policy: Allow public read access
+CREATE POLICY "Allow public read access"
+ON storage.objects
+FOR SELECT
+TO public
+USING (bucket_id = 'business-assets');
+
+-- Storage policy: Allow owners to update their files
+CREATE POLICY "Allow owners to update"
+ON storage.objects
+FOR UPDATE
+TO authenticated
+USING (bucket_id = 'business-assets' AND owner = auth.uid());
+
+-- Storage policy: Allow owners to delete their files
+CREATE POLICY "Allow owners to delete"
+ON storage.objects
+FOR DELETE
+TO authenticated
+USING (bucket_id = 'business-assets' AND owner = auth.uid());

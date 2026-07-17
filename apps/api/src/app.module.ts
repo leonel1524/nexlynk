@@ -9,6 +9,7 @@ import { MenusModule } from './menus/menus.module';
 import { LocationsModule } from './locations/locations.module';
 import { AnalyticsModule } from './analytics/analytics.module';
 import { ContactModule } from './contact/contact.module';
+import { UploadModule } from './upload/upload.module';
 import { SupabaseModule } from './common/supabase/supabase.module';
 
 @Module({
@@ -31,6 +32,7 @@ import { SupabaseModule } from './common/supabase/supabase.module';
     LocationsModule,
     AnalyticsModule,
     ContactModule,
+    UploadModule,
   ],
   controllers: [HealthController],
   providers: [

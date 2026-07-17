@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { BehaviorSubject, Observable, tap } from 'rxjs';
-import { User, AuthTokens, LoginRequest, RegisterRequest } from '@nexlynk/shared';
+import { User, AuthTokens, LoginRequest, RegisterRequest, STORAGE_KEYS } from '@nexlynk/shared';
 import { environment } from '../../../environments/environment';
 
 @Injectable({
@@ -52,18 +52,18 @@ export class AuthService {
   logout(): void {
     this.currentUserSubject.next(null);
     this.tokensSubject.next(null);
-    localStorage.removeItem('nexlynk_user');
-    localStorage.removeItem('nexlynk_tokens');
+    localStorage.removeItem(STORAGE_KEYS.user);
+    localStorage.removeItem(STORAGE_KEYS.tokens);
   }
 
   private saveToStorage(user: User, tokens: AuthTokens): void {
-    localStorage.setItem('nexlynk_user', JSON.stringify(user));
-    localStorage.setItem('nexlynk_tokens', JSON.stringify(tokens));
+    localStorage.setItem(STORAGE_KEYS.user, JSON.stringify(user));
+    localStorage.setItem(STORAGE_KEYS.tokens, JSON.stringify(tokens));
   }
 
   private loadFromStorage(): void {
-    const userStr = localStorage.getItem('nexlynk_user');
-    const tokensStr = localStorage.getItem('nexlynk_tokens');
+    const userStr = localStorage.getItem(STORAGE_KEYS.user);
+    const tokensStr = localStorage.getItem(STORAGE_KEYS.tokens);
 
     if (userStr && tokensStr) {
       try {

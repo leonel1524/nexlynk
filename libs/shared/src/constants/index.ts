@@ -86,8 +86,8 @@ export const API_ENDPOINTS = {
 
 // Storage keys
 export const STORAGE_KEYS = {
-  auth_token: 'nexlynk_auth_token',
-  refresh_token: 'nexlynk_refresh_token',
+  user: 'nexlynk_user',
+  tokens: 'nexlynk_tokens',
   theme: 'nexlynk_theme',
 } as const;
 

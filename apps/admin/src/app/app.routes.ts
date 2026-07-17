@@ -16,6 +16,19 @@ export const routes: Routes = [
     loadComponent: () => import('./auth/register.component').then(m => m.RegisterComponent)
   },
   {
+    path: 'forgot-password',
+    loadComponent: () => import('./auth/forgot-password.component').then(m => m.ForgotPasswordComponent)
+  },
+  {
+    path: 'reset-password',
+    loadComponent: () => import('./auth/reset-password.component').then(m => m.ResetPasswordComponent)
+  },
+  {
+    path: 'settings',
+    loadComponent: () => import('./settings/settings.component').then(m => m.SettingsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
     path: 'dashboard',
     loadComponent: () => import('./dashboard/dashboard.component').then(m => m.DashboardComponent),
     canActivate: [AuthGuard]
@@ -68,6 +81,16 @@ export const routes: Routes = [
   {
     path: 'businesses/:id/locations/:locationId/edit',
     loadComponent: () => import('./locations/location-form.component').then(m => m.LocationFormComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'businesses/:id/analytics',
+    loadComponent: () => import('./analytics/analytics.component').then(m => m.AnalyticsComponent),
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'businesses/:id/contact-messages',
+    loadComponent: () => import('./contact-messages/contact-messages.component').then(m => m.ContactMessagesComponent),
     canActivate: [AuthGuard]
   },
   {

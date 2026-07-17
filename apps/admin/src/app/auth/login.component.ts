@@ -55,6 +55,12 @@ import { AuthService } from '../shared/services/auth.service';
                 <p class="error-text">La contraseña es requerida</p>
               }
             </div>
+
+            <div class="text-right">
+              <a routerLink="/forgot-password" class="text-sm text-brand hover:text-brand-dark">
+                ¿Olvidaste tu contraseña?
+              </a>
+            </div>
           </div>
 
           @if (errorMessage) {

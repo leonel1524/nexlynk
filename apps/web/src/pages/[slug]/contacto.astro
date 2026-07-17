@@ -1,5 +1,6 @@
 ---
 import BusinessLayout from '../../layouts/BusinessLayout.astro';
+import Footer from '../../components/Footer.astro';
 
 const API_URL = import.meta.env.API_URL || 'http://localhost:3000/api';
 const { slug } = Astro.params;
@@ -124,15 +125,7 @@ try {
     </div>
 
     {/* Footer */}
-    <footer class="mt-16 pt-8 border-t border-gray-200 text-center">
-      <img src="/isologo.png" alt="Nexlynk" class="mx-auto mb-3 h-8 w-auto opacity-60" />
-      <p class="text-sm text-gray-500">
-        Creado con{' '}
-        <a href="https://nexlynk.app" target="_blank" rel="noopener noreferrer" class="text-brand hover:underline">
-          Nexlynk
-        </a>
-      </p>
-    </footer>
+    <Footer />
   </main>
 
   <script define:vars={{ businessId: business.id, apiUrl: API_URL }}>

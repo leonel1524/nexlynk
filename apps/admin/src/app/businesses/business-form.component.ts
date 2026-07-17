@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { BusinessService } from '../shared/services/business.service';
+import { UploadService } from '../shared/services/upload.service';
 import { Business, BUSINESS_TYPES } from '@nexlynk/shared';
 import { Subscription } from 'rxjs';
 
@@ -27,6 +28,70 @@ import { Subscription } from 'rxjs';
         </h1>
 
         <form [formGroup]="businessForm" (ngSubmit)="onSubmit()" class="space-y-6">
+          <!-- Logo Upload -->
+          <div>
+            <label class="label">Logo del negocio</label>
+            <div class="flex items-center gap-4">
+              <div class="w-20 h-20 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300">
+                @if (logoPreview) {
+                  <img [src]="logoPreview" alt="Logo" class="w-full h-full object-cover" />
+                } @else {
+                  <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                  </svg>
+                }
+              </div>
+              <div class="flex-1">
+                <input
+                  type="file"
+                  #logoInput
+                  accept="image/*"
+                  (change)="onFileSelect($event, 'logo')"
+                  class="hidden"
+                />
+                <button
+                  type="button"
+                  (click)="logoInput.click()"
+                  [disabled]="isUploading"
+                  class="btn-ghost text-sm"
+                >
+                  {{ isUploading ? 'Subiendo...' : 'Seleccionar logo' }}
+                </button>
+                <p class="text-xs text-gray-400 mt-1">JPG, PNG o WebP. Máx. 5MB.</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cover Upload -->
+          <div>
+            <label class="label">Imagen de portada</label>
+            <div class="w-full h-40 bg-gray-100 rounded-lg flex items-center justify-center overflow-hidden border-2 border-dashed border-gray-300">
+              @if (coverPreview) {
+                <img [src]="coverPreview" alt="Portada" class="w-full h-full object-cover" />
+              } @else {
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"/>
+                </svg>
+              }
+            </div>
+            <input
+              type="file"
+              #coverInput
+              accept="image/*"
+              (change)="onFileSelect($event, 'cover')"
+              class="hidden"
+            />
+            <button
+              type="button"
+              (click)="coverInput.click()"
+              [disabled]="isUploading"
+              class="btn-ghost text-sm mt-2"
+            >
+              {{ isUploading ? 'Subiendo...' : 'Seleccionar portada' }}
+            </button>
+            <p class="text-xs text-gray-400">JPG, PNG o WebP. Máx. 5MB.</p>
+          </div>
+
           <div>
             <label for="name" class="label">Nombre del negocio *</label>
             <input
@@ -134,7 +199,7 @@ import { Subscription } from 'rxjs';
           }
 
           <div class="flex items-center gap-4 pt-4">
-            <button type="submit" [disabled]="businessForm.invalid || isLoading" class="btn-primary">
+            <button type="submit" [disabled]="businessForm.invalid || isLoading || isUploading" class="btn-primary">
               {{ isEditing ? 'Guardar cambios' : 'Crear negocio' }}
             </button>
             <a routerLink="/businesses" class="btn-ghost">Cancelar</a>
@@ -149,13 +214,19 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
   isEditing = false;
   businessId: string | null = null;
   isLoading = false;
+  isUploading = false;
   errorMessage = '';
   businessTypes = BUSINESS_TYPES;
+  logoPreview: string | null = null;
+  coverPreview: string | null = null;
+  logoUrl: string | null = null;
+  coverUrl: string | null = null;
   private slugSubscription?: Subscription;
 
   constructor(
     private fb: FormBuilder,
     private businessService: BusinessService,
+    private uploadService: UploadService,
     private route: ActivatedRoute,
     private router: Router
   ) {
@@ -178,7 +249,6 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
       this.loadBusiness();
     }
 
-    // Auto-generate slug from name
     this.slugSubscription = this.businessForm.get('name')?.valueChanges.subscribe((name: string) => {
       if (!this.isEditing && !this.businessForm.get('slug')?.value) {
         const slug = this.generateSlug(name);
@@ -200,6 +270,52 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
       .replace(/^-+|-+$/g, '');
   }
 
+  onFileSelect(event: Event, type: 'logo' | 'cover'): void {
+    const input = event.target as HTMLInputElement;
+    if (!input.files?.length) return;
+
+    const file = input.files[0];
+    if (file.size > 5 * 1024 * 1024) {
+      this.errorMessage = 'El archivo excede el tamaño máximo de 5MB';
+      return;
+    }
+
+    // Show preview
+    const reader = new FileReader();
+    reader.onload = () => {
+      if (type === 'logo') {
+        this.logoPreview = reader.result as string;
+      } else {
+        this.coverPreview = reader.result as string;
+      }
+    };
+    reader.readAsDataURL(file);
+
+    // Upload file
+    this.isUploading = true;
+    const folder = type === 'logo' ? 'logos' : 'covers';
+
+    this.uploadService.upload(file, folder).subscribe({
+      next: (result) => {
+        this.isUploading = false;
+        if (type === 'logo') {
+          this.logoUrl = result.url;
+        } else {
+          this.coverUrl = result.url;
+        }
+      },
+      error: () => {
+        this.isUploading = false;
+        this.errorMessage = 'Error al subir la imagen';
+        if (type === 'logo') {
+          this.logoPreview = null;
+        } else {
+          this.coverPreview = null;
+        }
+      }
+    });
+  }
+
   loadBusiness(): void {
     if (!this.businessId) return;
 
@@ -207,6 +323,14 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
       next: (response) => {
         if (response.data) {
           this.businessForm.patchValue(response.data);
+          if (response.data.logo_url) {
+            this.logoPreview = response.data.logo_url;
+            this.logoUrl = response.data.logo_url;
+          }
+          if (response.data.cover_url) {
+            this.coverPreview = response.data.cover_url;
+            this.coverUrl = response.data.cover_url;
+          }
         }
       }
     });
@@ -218,9 +342,15 @@ export class BusinessFormComponent implements OnInit, OnDestroy {
     this.isLoading = true;
     this.errorMessage = '';
 
+    const formData = {
+      ...this.businessForm.value,
+      logo_url: this.logoUrl,
+      cover_url: this.coverUrl,
+    };
+
     const request = this.isEditing
-      ? this.businessService.update(this.businessId!, this.businessForm.value)
-      : this.businessService.create(this.businessForm.value);
+      ? this.businessService.update(this.businessId!, formData)
+      : this.businessService.create(formData);
 
     request.subscribe({
       next: () => {

@@ -107,6 +107,8 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  phone?: string;
+  website?: string;
   plan: PlanType;
   plan_expires_at?: Date;
   created_at: Date;
@@ -130,4 +132,26 @@ export interface RegisterRequest {
   password: string;
   name: string;
   business_name?: string;
+}
+
+// Contact Message types
+export interface ContactMessage {
+  id: string;
+  business_id: string;
+  name: string;
+  email: string;
+  phone?: string;
+  message: string;
+  is_read: boolean;
+  created_at: Date;
+}
+
+// Analytics Summary types
+export interface AnalyticsSummary {
+  total_views: number;
+  total_whatsapp_clicks: number;
+  total_maps_clicks: number;
+  total_phone_clicks: number;
+  total_menu_views: number;
+  recent_events: AnalyticsEvent[];
 }

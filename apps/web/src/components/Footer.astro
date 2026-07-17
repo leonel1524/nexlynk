@@ -1,0 +1,27 @@
+---
+export interface Props {
+  showTagline?: boolean;
+}
+
+const { showTagline = false } = Astro.props;
+---
+
+<footer class="mt-16 pt-8 border-t border-gray-200 text-center">
+  <img src="/isologo.png" alt="Nexlynk" class="mx-auto mb-3 h-8 w-auto opacity-60" />
+  <p class="text-sm text-gray-500">
+    Creado con{' '}
+    <a
+      href="https://nexlynk.app"
+      target="_blank"
+      rel="noopener noreferrer"
+      class="text-brand hover:underline"
+    >
+      Nexlynk
+    </a>
+  </p>
+  {showTagline && (
+    <p class="text-xs text-gray-400 mt-1">
+      El enlace entre tu negocio y el mundo
+    </p>
+  )}
+</footer>

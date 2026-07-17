@@ -1,8 +1,9 @@
-import { Injectable, UnauthorizedException, ConflictException, InternalServerErrorException } from '@nestjs/common';
+import { Injectable, UnauthorizedException, ConflictException, InternalServerErrorException, BadRequestException } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
 import { ConfigService } from '@nestjs/config';
 import { SupabaseService } from '../common/supabase/supabase.service';
-import { LoginDto, RegisterDto, AuthResponseDto } from './dto/auth.dto';
+import { LoginDto, RegisterDto, AuthResponseDto, UpdateProfileDto, ChangePasswordDto, ForgotPasswordDto, ResetPasswordDto } from './dto/auth.dto';
+import { generateSlug } from '@nexlynk/shared';
 
 @Injectable()
 export class AuthService {
@@ -106,7 +107,7 @@ export class AuthService {
 
     // Create business if name provided (DB operation → service_role)
     if (businessName) {
-      const slug = this.generateSlug(businessName);
+      const slug = generateSlug(businessName);
       const { error: bizError } = await this.supabaseService.client
         .from('businesses')
         .insert({
@@ -156,6 +157,102 @@ export class AuthService {
     return data;
   }
 
+  async updateProfile(userId: string, dto: UpdateProfileDto) {
+    if (!this.supabaseService.isConfigured) {
+      return { id: userId, ...dto, message: 'Perfil actualizado (mock)' };
+    }
+
+    const updateData: any = {};
+    if (dto.name !== undefined) updateData.name = dto.name;
+    if (dto.phone !== undefined) updateData.phone = dto.phone;
+    if (dto.website !== undefined) updateData.website = dto.website;
+
+    const { data, error } = await this.supabaseService.client
+      .from('users')
+      .update(updateData)
+      .eq('id', userId)
+      .select('*')
+      .single();
+
+    if (error) {
+      console.error('❌ Update profile failed:', error.message);
+      throw new InternalServerErrorException('Error al actualizar el perfil');
+    }
+
+    return data;
+  }
+
+  async changePassword(userId: string, dto: ChangePasswordDto) {
+    if (!this.supabaseService.isConfigured) {
+      return { message: 'Contraseña actualizada (mock)' };
+    }
+
+    // First verify current password by attempting sign-in
+    const { data: userData } = await this.supabaseService.client
+      .from('users')
+      .select('email')
+      .eq('id', userId)
+      .single();
+
+    if (!userData?.email) {
+      throw new InternalServerErrorException('Usuario no encontrado');
+    }
+
+    const { error: signInError } = await this.supabaseService.authClient.auth.signInWithPassword({
+      email: userData.email,
+      password: dto.currentPassword,
+    });
+
+    if (signInError) {
+      throw new UnauthorizedException('La contraseña actual es incorrecta');
+    }
+
+    const { error } = await this.supabaseService.authClient.auth.updateUser({
+      password: dto.newPassword,
+    });
+
+    if (error) {
+      console.error('❌ Change password failed:', error.message);
+      throw new InternalServerErrorException('Error al cambiar la contraseña');
+    }
+
+    return { message: 'Contraseña actualizada correctamente' };
+  }
+
+  async forgotPassword(dto: ForgotPasswordDto) {
+    if (!this.supabaseService.isConfigured) {
+      return { message: 'Si el correo existe, recibirás un enlace de recuperación' };
+    }
+
+    const { error } = await this.supabaseService.authClient.auth.resetPasswordForEmail(dto.email, {
+      redirectTo: `${this.configService.get<string>('ADMIN_URL', 'http://localhost:4200')}/reset-password`,
+    });
+
+    if (error) {
+      console.error('⚠️ Forgot password error (non-blocking):', error.message);
+    }
+
+    // Always return success to prevent email enumeration
+    return { message: 'Si el correo existe, recibirás un enlace de recuperación' };
+  }
+
+  async resetPassword(dto: ResetPasswordDto) {
+    if (!this.supabaseService.isConfigured) {
+      return { message: 'Contraseña restablecida (mock)' };
+    }
+
+    const { error } = await this.supabaseService.authClient.auth.updateUser({
+      password: dto.password,
+    });
+
+    if (error) {
+      console.error('❌ Reset password failed:', error.message);
+      throw new BadRequestException('Token inválido o expirado');
+    }
+
+    return { message: 'Contraseña restablecida correctamente' };
+  }
+
   private generateToken(userId: string, email: string): string {
     const payload = { sub: userId, email };
     const jwtSecret = this.configService.get<string>('JWT_SECRET');
@@ -168,15 +265,6 @@ export class AuthService {
       secret: jwtSecret,
       expiresIn: '1h',
     });
-  }
-
-  private generateSlug(text: string): string {
-    return text
-      .toLowerCase()
-      .trim()
-      .replace(/[^\w\s-]/g, '')
-      .replace(/[\s_-]+/g, '-')
-      .replace(/^-+|-+$/g, '');
   }
 
   private mockLogin(email: string): AuthResponseDto {
