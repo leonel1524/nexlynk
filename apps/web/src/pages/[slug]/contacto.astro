@@ -135,7 +135,7 @@ try {
     </footer>
   </main>
 
-  <script define:vars={{ businessId: business.id }}>
+  <script define:vars={{ businessId: business.id, apiUrl: API_URL }}>
     const form = document.getElementById('contact-form');
     const successMsg = document.getElementById('form-success');
     const errorMsg = document.getElementById('form-error');
@@ -152,7 +152,7 @@ try {
       };
 
       try {
-        const response = await fetch(`${window.location.origin}/api/businesses/${businessId}/contact`, {
+        const response = await fetch(`${apiUrl}/businesses/${businessId}/contact`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(data),

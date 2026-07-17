@@ -248,7 +248,9 @@ export class MenusService {
   }
 
   // Menu Items
-  async updateItem(itemId: string, dto: UpdateMenuItemDto) {
+  async updateItem(itemId: string, businessId: string, userId: string, dto: UpdateMenuItemDto) {
+    await this.verifyOwnership(businessId, userId);
+
     if (!this.supabaseService.isConfigured) {
       return { id: itemId, ...dto };
     }
@@ -267,7 +269,9 @@ export class MenusService {
     return data;
   }
 
-  async removeItem(itemId: string) {
+  async removeItem(itemId: string, businessId: string, userId: string) {
+    await this.verifyOwnership(businessId, userId);
+
     if (!this.supabaseService.isConfigured) {
       return { message: 'Item eliminado' };
     }

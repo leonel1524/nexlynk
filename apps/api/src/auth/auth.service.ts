@@ -158,7 +158,11 @@ export class AuthService {
 
   private generateToken(userId: string, email: string): string {
     const payload = { sub: userId, email };
-    const jwtSecret = this.configService.get<string>('JWT_SECRET') || 'nexlynk-secret';
+    const jwtSecret = this.configService.get<string>('JWT_SECRET');
+    
+    if (!jwtSecret) {
+      throw new InternalServerErrorException('JWT_SECRET no está configurado');
+    }
     
     return this.jwtService.sign(payload, {
       secret: jwtSecret,

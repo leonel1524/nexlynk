@@ -1,5 +1,6 @@
 import { Controller, Post, Get, Patch, Body, Param, UseGuards, Request, Req } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiBearerAuth } from '@nestjs/swagger';
+import { Throttle } from '@nestjs/throttler';
 import { ContactService } from './contact.service';
 import { CreateContactMessageDto } from './dto/contact.dto';
 import { JwtAuthGuard } from '../common/guards/jwt-auth.guard';
@@ -12,6 +13,7 @@ export class ContactController {
   constructor(private readonly contactService: ContactService) {}
 
   @Post(':businessId/contact')
+  @Throttle({ default: { limit: 5, ttl: 60000 } })
   @ApiOperation({ summary: 'Enviar mensaje de contacto' })
   @ApiResponse({ status: 201, description: 'Mensaje enviado correctamente' })
   @ApiResponse({ status: 404, description: 'Negocio no encontrado' })

@@ -77,16 +77,22 @@ export class MenusController {
   @ApiOperation({ summary: 'Actualizar un item del menú' })
   async updateItem(
     @Param('itemId') itemId: string,
+    @Param('businessId') businessId: string,
     @Body() dto: UpdateMenuItemDto,
+    @Request() req: any,
   ) {
-    const data = await this.menusService.updateItem(itemId, dto);
+    const data = await this.menusService.updateItem(itemId, businessId, req.user.id, dto);
     return apiResponse(data);
   }
 
   @Delete('items/:itemId')
   @ApiOperation({ summary: 'Eliminar un item del menú' })
-  async removeItem(@Param('itemId') itemId: string) {
-    await this.menusService.removeItem(itemId);
+  async removeItem(
+    @Param('itemId') itemId: string,
+    @Param('businessId') businessId: string,
+    @Request() req: any,
+  ) {
+    await this.menusService.removeItem(itemId, businessId, req.user.id);
     return apiMessage('Item eliminado correctamente');
   }
 }
